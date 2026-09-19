@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detektif Gaya: Misteri di Sekitar Kita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#132347; --ink-soft:#3a4a72;
+    --paper:#FFF7E6; --gold:#F2B33D; --gold-deep:#D9962A;
+    --ok:#3FA66A; --bad:#E15757;
+    --card-back-1:#1B2A4A; --card-back-2:#233866;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #24406e 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #2c1f52 0%, transparent 55%),
+      linear-gradient(180deg,#0e1a34 0%, #14224a 55%, #1a2c5c 100%);
+    min-height:100vh; color:var(--paper);
+    padding: 24px 14px 60px;
+  }
+  h1,h2,.font-display{font-family:'Baloo 2',cursive;}
+  .wrap{max-width:980px;margin:0 auto;}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(242,179,61,0.14); border:1px solid rgba(242,179,61,0.4);
+    color:var(--gold); padding:6px 14px;border-radius:999px;
+    font-weight:700;font-size:13px;
+  }
+  .hero{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .hero h1{font-size:clamp(26px,4.2vw,40px);line-height:1.06;margin:6px 0 2px;color:var(--paper);}
+  .hero h1 span{color:var(--gold);}
+  .hero p{margin:0;color:#c9d3ec;max-width:64ch;font-size:15px;}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px;}
+  .stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:9px 16px;min-width:112px;}
+  .stat .n{font-family:'Baloo 2';font-size:21px;font-weight:700;color:var(--gold);display:block;}
+  .stat .l{font-size:11.5px;color:#aebadd;text-transform:uppercase;letter-spacing:.05em;}
+
+  .board-frame{position:relative;border-radius:22px;padding:14px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.14);overflow:hidden;}
+
+  .scene{position:absolute; inset:14px;border-radius:14px;
+    background:
+      radial-gradient(60px 60px at 85% 18%, #FFE9A8 0%, #FFE9A8 40%, transparent 42%),
+      linear-gradient(180deg,#8FCBEA 0%, #BFE3F2 42%, #DCEFD8 43%, #8FCB86 100%);
+    overflow:hidden;}
+  .scene .hill{position:absolute;bottom:0;left:-10%;width:60%;height:28%;background:#6FB868;border-radius:50% 50% 0 0/100% 100% 0 0;}
+  .scene .hill2{position:absolute;bottom:0;right:-15%;width:70%;height:22%;background:#5FA75E;border-radius:50% 50% 0 0/100% 100% 0 0;}
+  .scene .tree-trunk{position:absolute;bottom:22%;left:12%;width:10px;height:60px;background:#8a5a34;}
+  .scene .tree-leaf{position:absolute;bottom:38%;left:5%;width:70px;height:70px;background:#3f8f4a;border-radius:50%;}
+  .scene .house{position:absolute;bottom:20%;right:10%;width:90px;height:70px;background:#F4D9A0;border-radius:4px;}
+  .scene .roof{position:absolute;bottom:calc(20% + 68px);right:calc(10% - 6px);width:0;height:0;border-left:53px solid transparent;border-right:53px solid transparent;border-bottom:38px solid #C1573B;}
+  .scene .door{position:absolute;bottom:20%;right:calc(10% + 30px);width:26px;height:38px;background:#8a5a34;border-radius:4px 4px 0 0;}
+  .scene .cloud{position:absolute;width:60px;height:22px;background:rgba(255,255,255,0.85);border-radius:20px;}
+  .scene .cloud::before,.scene .cloud::after{content:"";position:absolute;background:rgba(255,255,255,0.85);border-radius:50%;}
+  .scene .cloud::before{width:26px;height:26px;top:-12px;left:6px;}
+  .scene .cloud::after{width:20px;height:20px;top:-8px;left:30px;}
+
+  .grid{position:relative; z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  @media(min-width:600px){ .grid{grid-template-columns:repeat(5,1fr);} }
+
+  .card{aspect-ratio:3/4;border-radius:12px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;
+    transition:opacity .5s ease, transform .2s ease;}
+  .card-inner{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:4px;text-align:center;padding:6px;
+    background:linear-gradient(145deg,var(--card-back-1),var(--card-back-2));
+    border:2px solid rgba(255,255,255,0.15); color:rgba(242,179,61,0.85); font-size:22px;
+    transition:background .2s ease, border-color .2s ease;}
+  .card.revealed .card-inner{background:var(--paper);color:var(--ink);border-color:var(--gold);}
+  .card.revealed .icon{font-size:24px;}
+  .card.revealed .label{font-family:'Baloo 2';font-weight:700;font-size:11px;line-height:1.15;color:var(--ink-soft);}
+  .card.selected .card-inner{outline:3px solid var(--gold);outline-offset:2px;}
+  .card.correct .card-inner{background:#DBF3E4;border-color:var(--ok);}
+  .card.incorrect .card-inner{background:#FBDADA;border-color:var(--bad);}
+  .card.solved{opacity:0;pointer-events:none;transform:scale(.85);}
+
+  .legend{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;}
+  .legend span{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;
+    background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#dbe2f6;}
+
+  .prompt-bar{margin-top:18px;min-height:26px;font-weight:700;color:var(--gold);font-family:'Baloo 2';font-size:15px;}
+
+  .choices{margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;}
+  .choice-btn{
+    font-family:'Baloo 2';font-weight:700;font-size:14px;
+    border:1px solid rgba(255,255,255,0.25);cursor:pointer;
+    padding:10px 16px;border-radius:12px;background:rgba(255,255,255,0.06);color:var(--paper);
+    transition:transform .15s ease, background .2s ease;
+  }
+  .choice-btn:hover:not(:disabled){transform:translateY(-1px);background:rgba(242,179,61,0.18);border-color:var(--gold);}
+  .choice-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+  .actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  button.btn{font-family:'Baloo 2';font-weight:700;font-size:15px;border:none;cursor:pointer;
+    padding:11px 20px;border-radius:12px;background:var(--gold);color:#1a1200;
+    transition:transform .15s ease, background .2s ease;}
+  button.btn:hover{transform:translateY(-1px);background:var(--gold-deep);}
+  button.btn.ghost{background:transparent;color:var(--paper);border:1px solid rgba(255,255,255,0.3);}
+
+  .modal-wrap{position:fixed;inset:0;background:rgba(9,14,28,0.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:50;}
+  .modal-wrap.show{display:flex;}
+  .modal{background:var(--paper);color:var(--ink);border-radius:20px;max-width:460px;width:100%;padding:28px 26px;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,0.4);}
+  .modal h2{margin:6px 0 8px;font-size:26px;}
+  .modal p{margin:0 0 14px;color:var(--ink-soft);font-size:14.5px;}
+  .modal ul{text-align:left;margin:0 0 18px;padding-left:0;list-style:none;}
+  .modal li{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:6px 0;border-bottom:1px dashed #e6d9b8;}
+  .modal li:last-child{border-bottom:none;}
+
+  footer{text-align:center;margin-top:26px;color:#8a97bd;font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="badge">🔎 Misi IPAS · Jenis-jenis Gaya</span>
+    <h1>Detektif Gaya<span>:</span> Misteri di Sekitar Kita</h1>
+    <p>Buka satu kartu misteri, baca aktivitasnya, lalu tebak jenis gaya yang bekerja di baliknya. Jawaban benar akan menyingkap sedikit demi sedikit pemandangan rahasia di papan!</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><span class="n" id="statPairs">0/15</span><span class="l">Kasus Terpecahkan</span></div>
+    <div class="stat"><span class="n" id="statMoves">0</span><span class="l">Percobaan</span></div>
+    <div class="stat"><span class="n" id="statScore">0</span><span class="l">Skor</span></div>
+  </div>
+
+  <div class="board-frame">
+    <div class="scene" aria-hidden="true">
+      <div class="cloud" style="top:8%;left:12%"></div>
+      <div class="cloud" style="top:14%;left:55%"></div>
+      <div class="hill"></div>
+      <div class="hill2"></div>
+      <div class="tree-trunk"></div>
+      <div class="tree-leaf"></div>
+      <div class="house"></div>
+      <div class="roof"></div>
+      <div class="door"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="prompt-bar" id="promptBar">Klik salah satu kartu misteri untuk memulai.</div>
+  <div class="choices" id="choices"></div>
+
+  <div class="legend">
+    <span>💪 Gaya Otot</span>
+    <span>🧽 Gaya Gesek</span>
+    <span>🧲 Gaya Magnet</span>
+    <span>🍎 Gaya Gravitasi</span>
+    <span>🎯 Gaya Pegas</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="restartBtn">🔄 Main Ulang</button>
+    <button class="btn ghost" id="soundBtn">🔊 Suara: Aktif</button>
+  </div>
+
+  <footer>Dibuat untuk pembelajaran IPAS Kelas 4 &mdash; SD Negeri Manyaran 01</footer>
+</div>
+
+<div class="modal-wrap" id="modalWrap">
+  <div class="modal">
+    <div style="font-size:46px;">🕵️‍♀️🏅</div>
+    <h2>Kasus Terpecahkan!</h2>
+    <p id="modalSummary">Kamu berhasil menyelesaikan semua misteri gaya.</p>
+    <ul id="modalList"></ul>
+    <button class="btn" id="playAgainBtn">Main Lagi</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const groups = [
+    { force: "Gaya Otot", icon:"💪", note: "Gaya yang dihasilkan oleh tenaga otot manusia atau hewan.",
+      items: [
+        {icon:"🚴", text:"Mengayuh sepeda"},
+        {icon:"🏋️", text:"Mengangkat beban"},
+        {icon:"🛒", text:"Mendorong troli belanja"},
+      ]},
+    { force: "Gaya Gesek", icon:"🧽", note: "Gaya yang timbul akibat gesekan antara dua permukaan.",
+      items: [
+        {icon:"🛹", text:"Mengerem skateboard"},
+        {icon:"🧹", text:"Menyapu lantai"},
+        {icon:"✏️", text:"Menghapus dengan penghapus"},
+      ]},
+    { force: "Gaya Magnet", icon:"🧲", note: "Gaya tarik atau tolak dari benda magnetis.",
+      items: [
+        {icon:"📌", text:"Magnet menarik paku"},
+        {icon:"🚪", text:"Magnet kulkas menempel"},
+        {icon:"🎣", text:"Memancing ikan mainan bermagnet"},
+      ]},
+    { force: "Gaya Gravitasi", icon:"🍎", note: "Gaya tarik bumi terhadap semua benda.",
+      items: [
+        {icon:"🍏", text:"Buah jatuh dari pohon"},
+        {icon:"🪂", text:"Payung terjun turun ke tanah"},
+        {icon:"💧", text:"Air terjun mengalir ke bawah"},
+      ]},
+    { force: "Gaya Pegas", icon:"🎯", note: "Gaya dari benda elastis yang meregang atau memampat.",
+      items: [
+        {icon:"🏹", text:"Menarik ketapel"},
+        {icon:"🤸", text:"Memantul di trampolin"},
+        {icon:"🚗", text:"Per pada mobil mainan"},
+      ]},
+  ];
+
+  const cards = [];
+  groups.forEach((g, gi)=>{
+    g.items.forEach(it=>{
+      cards.push({ groupIndex: gi, icon: it.icon, text: it.text });
+    });
+  });
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  let state = {};
+  const grid = document.getElementById("grid");
+  const choicesEl = document.getElementById("choices");
+  const promptBar = document.getElementById("promptBar");
+  const statPairs = document.getElementById("statPairs");
+  const statMoves = document.getElementById("statMoves");
+  const statScore = document.getElementById("statScore");
+  const modalWrap = document.getElementById("modalWrap");
+  const modalList = document.getElementById("modalList");
+  const modalSummary = document.getElementById("modalSummary");
+  const total = cards.length;
+
+  function newGame(){
+    const order = shuffle(cards.map((c,i)=>i));
+    state = { order, solved: new Set(), selected: null, moves: 0, score: 0, groupOrder: shuffle(groups.map((g,i)=>i)) };
+    grid.innerHTML = "";
+    order.forEach(cardIdx=>{
+      const el = document.createElement("div");
+      el.className = "card";
+      el.dataset.idx = cardIdx;
+      el.innerHTML = `<div class="card-inner"><span>🔍</span></div>`;
+      el.addEventListener("click", ()=>onCardClick(cardIdx, el));
+      grid.appendChild(el);
+    });
+    renderChoices();
+    updateStats();
+    promptBar.textContent = "Klik salah satu kartu misteri untuk memulai.";
+    modalWrap.classList.remove("show");
+  }
+
+  function renderChoices(){
+    choicesEl.innerHTML = "";
+    state.groupOrder.forEach(gi=>{
+      const g = groups[gi];
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = `${g.icon} ${g.force}`;
+      btn.disabled = true;
+      btn.addEventListener("click", ()=>onChoice(gi, btn));
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function updateStats(){
+    statPairs.textContent = `${state.solved.size}/${total}`;
+    statMoves.textContent = state.moves;
+    statScore.textContent = state.score;
+  }
+
+  function cardEl(idx){ return grid.querySelector(`.card[data-idx="${idx}"]`); }
+
+  function onCardClick(idx, el){
+    if(state.solved.has(idx)) return;
+    if(state.selected !== null && state.selected !== idx) return; // finish current guess first
+    if(el.classList.contains("revealed")) return;
+
+    const card = cards[idx];
+    el.classList.add("revealed", "selected");
+    el.innerHTML = `<div class="card-inner"><div class="icon">${card.icon}</div><div class="label">${card.text}</div></div>`;
+    state.selected = idx;
+    promptBar.textContent = `"${card.text}" — termasuk jenis gaya apa?`;
+    choicesEl.querySelectorAll(".choice-btn").forEach(b=>b.disabled=false);
+    playTone(520, 0.06, "sine");
+  }
+
+  function onChoice(groupIndex, btn){
+    if(state.selected === null) return;
+    const idx = state.selected;
+    const el = cardEl(idx);
+    const card = cards[idx];
+    state.moves++;
+
+    choicesEl.querySelectorAll(".choice-btn").forEach(b=>b.disabled=true);
+
+    if(groupIndex === card.groupIndex){
+      el.classList.add("correct");
+      state.score += 10;
+      state.solved.add(idx);
+      promptBar.textContent = `Benar! "${card.text}" adalah contoh ${groups[card.groupIndex].force}.`;
+      playSuccess();
+      setTimeout(()=>{ el.classList.add("solved"); state.selected = null; updateStats();
+        if(state.solved.size === total){ setTimeout(showComplete, 400); }
+        else { promptBar.textContent = "Klik kartu misteri berikutnya."; }
+      }, 700);
+    } else {
+      el.classList.add("incorrect");
+      promptBar.textContent = "Belum tepat, coba pikirkan lagi ya!";
+      playFail();
+      setTimeout(()=>{
+        el.classList.remove("revealed","selected","incorrect");
+        el.innerHTML = `<div class="card-inner"><span>🔍</span></div>`;
+        state.selected = null;
+        promptBar.textContent = "Klik salah satu kartu misteri untuk memulai.";
+      }, 700);
+    }
+    updateStats();
+  }
+
+  function showComplete(){
+    modalSummary.textContent = `Skor akhir ${state.score} dengan ${state.moves} percobaan. Kamu sudah menguasai 5 jenis gaya berikut:`;
+    modalList.innerHTML = groups.map(g=>`<li><span>✅</span><span><b>${g.force}</b> — ${g.note}</span></li>`).join("");
+    modalWrap.classList.add("show");
+    playFanfare();
+  }
+
+  document.getElementById("restartBtn").addEventListener("click", newGame);
+  document.getElementById("playAgainBtn").addEventListener("click", newGame);
+
+  let audioCtx = null;
+  let soundOn = true;
+  const soundBtn = document.getElementById("soundBtn");
+  soundBtn.addEventListener("click", ()=>{
+    soundOn = !soundOn;
+    soundBtn.textContent = soundOn ? "🔊 Suara: Aktif" : "🔇 Suara: Mati";
+  });
+  function ctx(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+  function playTone(freq, dur, type){
+    if(!soundOn) return;
+    try{
+      const c = ctx();
+      const osc = c.createOscillator(); const gain = c.createGain();
+      osc.type = type || "sine"; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.12, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+      osc.connect(gain).connect(c.destination);
+      osc.start(); osc.stop(c.currentTime + dur);
+    }catch(e){}
+  }
+  function playSuccess(){ playTone(660,0.1,"triangle"); setTimeout(()=>playTone(880,0.14,"triangle"),90); }
+  function playFail(){ playTone(180,0.22,"sawtooth"); }
+  function playFanfare(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>playTone(f,0.18,"triangle"), i*130)); }
+
+  newGame();
+})();
+</script>
+</body>
+</html>
